@@ -14,7 +14,7 @@ from plotune_sdk.server import PlotuneServer
 from plotune_sdk.core import CoreClient
 from plotune_sdk.utils import get_logger
 
-logger = get_logger("plotune_runtime", console=True)
+logger = get_logger("plotune_runtime", console=False)
 
 class PlotuneRuntime:
     def __init__(

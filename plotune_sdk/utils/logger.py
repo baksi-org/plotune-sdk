@@ -17,7 +17,7 @@ def get_logger(name: str = "plotune_sdk", console: bool = True) -> logging.Logge
     if logger.handlers:
         return logger
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
 
     # 🔸 File Handler — rotates automatically
     file_handler = RotatingFileHandler(

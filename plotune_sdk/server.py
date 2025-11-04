@@ -7,7 +7,7 @@ from plotune_sdk.models.variable_models import Variable, NewVariable
 
 from plotune_sdk.utils import get_logger
 
-logger = get_logger("plotune_server", console=True)
+logger = get_logger("plotune_server", console=False)
 
 class PlotuneServer:
     def __init__(self, host: str = "localhost", port: int = 8000, log_level: str = "info"):

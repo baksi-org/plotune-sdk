@@ -6,7 +6,9 @@ from time import time
 from typing import Optional
 from plotune_sdk.models.config_models import ExtensionConfig
 
-logger = logging.getLogger("plotune_core_client")
+from plotune_sdk.utils import get_logger
+
+logger = get_logger("plotune_core", console=False)
 
 class CoreClient:
     def __init__(self, core_url: str, config: dict, api_key: Optional[str] = None):
