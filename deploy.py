@@ -1,6 +1,8 @@
 import subprocess
 import os
+import sys
 from dotenv import load_dotenv
+import shutil
 
 def deploy_package():
     print("🚀 Loading .env file...")
@@ -13,36 +15,31 @@ def deploy_package():
         print("Please check the contents of your .env file.")
         return
 
-    # 2. Clean up previous distribution files (Optional but good practice)
     print("🧹 Cleaning up previous 'dist' folder and '__pycache__' files...")
-    try:
-        # Note: This command is for Unix-like systems (Linux/macOS). 
-        # Adjust if you are strictly on Windows (e.g., use 'shutil.rmtree')
-        subprocess.run(["rm", "-rf", "dist", "build", "*.egg-info"], check=True)
-    except FileNotFoundError:
-        pass # Ignore if 'rm' is not found or files don't exist
+    for folder in ["dist", "build"]:
+        shutil.rmtree(folder, ignore_errors=True)
+    for egg in [f for f in os.listdir(".") if f.endswith(".egg-info")]:
+        shutil.rmtree(egg, ignore_errors=True)
 
-    # 3. Build the package (.whl and .tar.gz)
+    python_exe = sys.executable  
+    print(f"🐍 Using Python executable: {python_exe}")
+
     print("📦 Building distribution packages (python -m build)...")
     try:
-        subprocess.run(["python", "-m", "build"], check=True)
+        subprocess.run([python_exe, "-m", "build"], check=True)
         print("✅ Packages successfully built.")
     except subprocess.CalledProcessError as e:
         print(f"❌ ERROR: Package build failed. Error: {e}")
         return
 
-    # 4. Upload the package to PyPI using Twine
     print("📤 Uploading to PyPI (python -m twine upload dist/*)...")
     try:
-        # We pass the token directly to Twine using ENV variables.
-        # TWINE_USERNAME must be "__token__".
-        # TWINE_PASSWORD is the actual token from the .env file.
         env = os.environ.copy()
         env["TWINE_USERNAME"] = "__token__"
         env["TWINE_PASSWORD"] = pypi_token
 
         subprocess.run(
-            ["python", "-m", "twine", "upload", "dist/*"],
+            [python_exe, "-m", "twine", "upload", "dist/*"],
             env=env,
             check=True
         )
