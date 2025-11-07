@@ -12,7 +12,7 @@ EXAMPLE_EXTENSION_CONFIG = {
     "cmd": [
         "python",
         "-m",
-        "examples.example_extension"
+        "examples.example_form_extension"
     ],
     "enabled": True,
     "last_updated": datetime.utcnow().strftime("%Y-%m-%d"),
