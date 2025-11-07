@@ -20,14 +20,23 @@ class CoreClient:
         self._hb_task: Optional[asyncio.Task] = None
         logger.debug(f"CoreClient initialized with core_url: {self.core_url}")
 
+        self.register_fail_handler:callable = None
+        self.heartbeat_fail_handler:callable = None
+
     async def register(self):
-        url = f"{self.core_url}/register"
-        headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
-        payload = ExtensionConfig(**self.config).dict()
-        logger.debug(f"Registering with payload: {payload}")
-        r = await self.session.post(url, json=payload, headers=headers)
-        r.raise_for_status()
-        logger.info("Successfully registered with core server.")
+        try:
+            url = f"{self.core_url}/register"
+            headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+            payload = ExtensionConfig(**self.config).dict()
+            logger.debug(f"Registering with payload: {payload}")
+            r = await self.session.post(url, json=payload, headers=headers)
+            r.raise_for_status()
+            logger.info("Successfully registered with core server.")
+        except Exception as e:
+            logger.error(f"Failed to register with core server: {e}")
+            if self.register_fail_handler:
+                self.register_fail_handler()
+
 
     async def send_heartbeat(self, ext_id: str) -> bool:
         url = f"{self.core_url}/heartbeat"
@@ -54,6 +63,8 @@ class CoreClient:
                 logger.warning(f"Failed heartbeats: {fail_count}/{max_failures}")
                 if fail_count >= max_failures:
                     logger.critical("Max heartbeat failures reached, stopping heartbeat loop")
+                    if self.heartbeat_fail_handler:
+                        self.heartbeat_fail_handler()
                     break
             try:
                 await asyncio.wait_for(self._stop_event.wait(), timeout=interval)

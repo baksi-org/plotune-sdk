@@ -33,7 +33,16 @@ class PlotuneRuntime:
         self.tray_icon_enabled = tray_icon
         self.config = config or {"id": ext_name}
         self.server = PlotuneServer(host=self.host, port=self.port)
+
+        @self.server.on_event("/stop", method="GET")
+        async def handle_stop_request(_, __):
+            logger.info("Stop request received via /stop endpoint.")
+            self.stop()
+            return {"status": "stopping"}
+
         self.core_client = CoreClient(core_url=self.core_url, config=self.config)
+        self.core_client.register_fail_handler = self.stop
+        self.core_client.heartbeat_fail_handler = self.stop
 
         self.icon = None
         self.loop = asyncio.new_event_loop()

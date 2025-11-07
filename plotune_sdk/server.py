@@ -29,6 +29,7 @@ class PlotuneServer:
     def init_policies(self):
         self._ws_policy["fetch"] = False  # default optional
         self._handler_policy[("/health", "GET")] = False
+        self._handler_policy[("/stop", "GET")] = False
         self._handler_policy[("/read-file", "POST")] = True
         self._handler_policy[("/form", "GET")] = False
         self._handler_policy[("/form", "POST")] = True
@@ -48,6 +49,11 @@ class PlotuneServer:
         @self.api.get("/health", tags=["System"], summary="Health Check")
         async def health(request: Request):
             result = await self._trigger_event("/health", "GET", request)
+            return result or {"status": "ok"}
+        
+        @self.api.get("/stop", tags=["System"], summary="Stop Extension")
+        async def health(request: Request):
+            result = await self._trigger_event("/stop", "GET", request)
             return result or {"status": "ok"}
 
         # 🔹 File Read — must return valid FileMetaData
@@ -159,18 +165,19 @@ class PlotuneServer:
 
 
     # 🔸 Trigger HTTP events
-    async def _trigger_event(self, path: str, method: str, request: Any) -> Optional[Any]:
+    async def _trigger_event(self, path: str, method: str, *args, **kwargs) -> Optional[Any]:
         key = (path, method.upper())
         if key not in self._event_hooks:
             return None
 
         result = None
         for func in self._event_hooks[key]:
-            out = func(request)
+            out = func(*args, **kwargs)
             if callable(getattr(out, "__await__", None)):
                 out = await out
             result = out
         return result
+
 
     # 🔸 Trigger WebSocket events
     async def _trigger_ws_event(self, signal_name: str, websocket: WebSocket, data: Any):
