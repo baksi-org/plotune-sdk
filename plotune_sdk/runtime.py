@@ -35,7 +35,7 @@ class PlotuneRuntime:
         self.server = PlotuneServer(host=self.host, port=self.port)
 
         @self.server.on_event("/stop", method="GET")
-        async def handle_stop_request(_, __):
+        async def handle_stop_request(_):
             logger.info("Stop request received via /stop endpoint.")
             self.stop()
             return {"status": "stopping"}
