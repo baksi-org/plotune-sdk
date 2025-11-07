@@ -67,7 +67,8 @@ class CoreClient:
                         self.heartbeat_fail_handler()
                     break
             try:
-                await asyncio.wait_for(self._stop_event.wait(), timeout=interval)
+                wait_time = max(int(interval/(fail_count*2 + 1)), 1)
+                await asyncio.wait_for(self._stop_event.wait(), timeout = wait_time)
             except asyncio.TimeoutError:
                 continue  # timeout expired -> send next heartbeat
 
