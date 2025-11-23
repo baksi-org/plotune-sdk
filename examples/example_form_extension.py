@@ -84,8 +84,15 @@ async def get_answer(data: dict):
     random.seed(data.get("seed"))
     return {"status": "success", "message": "Form saved!"}
 
+@runtime.tray("Add Random Variable")
+async def say_hello():
+    import random
+    var_name = f"RandomVar_{random.randint(1000,9999)}"
+    await runtime.core_client.add_variable(variable_name=var_name, variable_desc="A randomly added variable")
+
 @runtime.server.on_ws()
 async def stream(signal_name, websocket, _):
+    print(signal_name,"requested")
     try:
         while True:
             await websocket.send_json({
