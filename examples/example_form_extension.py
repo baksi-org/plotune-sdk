@@ -32,8 +32,8 @@ EXAMPLE_EXTENSION_CONFIG = {
     }
 }
 
-from plotune_sdk.runtime import PlotuneRuntime
-from plotune_sdk.forms import FormLayout
+from plotune_sdk import PlotuneRuntime
+from plotune_sdk import FormLayout
 
 
 runtime = PlotuneRuntime(

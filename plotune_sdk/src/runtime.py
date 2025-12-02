@@ -10,8 +10,7 @@ from PIL import Image, ImageDraw
 
 from typing import Callable, List, Tuple
 
-from plotune_sdk.server import PlotuneServer
-from plotune_sdk.core import CoreClient
+from plotune_sdk.src import PlotuneServer, CoreClient
 from plotune_sdk.utils import get_logger
 
 logger = get_logger("extension")

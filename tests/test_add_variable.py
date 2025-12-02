@@ -32,7 +32,7 @@ EXAMPLE_EXTENSION_CONFIG = {
 
 
 
-from plotune_sdk.runtime import PlotuneRuntime
+from plotune_sdk import PlotuneRuntime
 
 runtime = PlotuneRuntime(
     ext_name="file-extension", 

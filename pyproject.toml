@@ -26,6 +26,7 @@ dependencies = [
     "pystray >=0.19.5,<1",
     "packaging >=24.0,<25",
     "platformdirs >=4.0.0,<5",
+    "diskcache >=5.6.3,<6"
 ]
 
 dynamic = ["version"]
@@ -41,6 +42,7 @@ dev = [
     "pytest-cov >=4.0.0,<5",
     "types-httpx",
     "types-pydantic",
+    "diskcache >=5.6.3,<6",
 ]
 
 [build-system]

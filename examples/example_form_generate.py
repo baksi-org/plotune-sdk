@@ -1,5 +1,5 @@
 # example_form_gen.py (or integrate into your extension)
-from plotune_sdk.forms import FormLayout
+from plotune_sdk import FormLayout
 import json  # For pretty-printing the output
 
 # Build the schema step-by-step
