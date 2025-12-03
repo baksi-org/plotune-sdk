@@ -80,8 +80,7 @@ class PlotuneStream:
     async def _queue_reader(self, group: str, q: Queue):
         handlers = self.handlers.get(group, [])
         logger.info(f"[{group}] Queue reader started (async)")
-        import queue
-        # Her 100ms'de bir queue'yu poll et (blocking değil!)
+        
         while True:
             try:
                 # NON-BLOCKING poll + timeout

@@ -106,17 +106,14 @@ async def my_socket(signal_name, websocket, _):
 
 stream = runtime.create_stream("my-second-stream")
 
-@stream.on_consume("prices")
-async def on_price(msg):
-    print("💰 PRICE:", msg)
-
-@stream.on_consume("trades")
-async def on_trade(msg):
-    print("⚡ TRADE:", msg)
-
 @stream.on_consume()
-async def on_anything(msg):
-    print("🎲 OTHER:", msg)
+async def on_price(msg):
+    data = msg.get("payload")
+    key = data.get("key")
+    if key == "Voltage":
+        timestamp, value = float(data.get("time")), float(data.get("value"))
+        print(key,timestamp,value)
+
 
 if __name__ == "__main__":
     runtime.start()
