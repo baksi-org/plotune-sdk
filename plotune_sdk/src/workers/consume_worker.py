@@ -21,6 +21,7 @@ async def _put_to_queue_async(q: Queue, item: Any):
 
 async def consume(username: str, stream_name: str, group: str, token: str, q: Queue):
     url = build_url(username, stream_name, group)
+    print(f"[{group}] Connecting to {url}")  # YENİ LOG
 
     try:
         async with ClientSession() as session:
@@ -28,24 +29,24 @@ async def consume(username: str, stream_name: str, group: str, token: str, q: Qu
                 url,
                 headers={"Authorization": f"Bearer {token}"}
             ) as ws:
+                print(f"[{group}] WebSocket CONNECTED successfully!")  # BAĞLANTI BAŞARILI
+
                 async for msg in ws:
                     if msg.type == WSMsgType.TEXT:
-                        try:
-                            data = json.loads(msg.data)
-                        except Exception:
-                            data = msg.data
-                        # push to main process without blocking event loop
+                        data = json.loads(msg.data)
+                        print(f"[{group}] MESSAGE RECEIVED: {data}")  # MESAJ GELDİ
                         await _put_to_queue_async(q, {"type": "message", "payload": data})
                     elif msg.type == WSMsgType.ERROR:
-                        await _put_to_queue_async(q, {"type": "error", "payload": str(ws.exception())})
-    except asyncio.CancelledError:
-        raise
-    except Exception as exc:
-        # forward unexpected worker errors to main (best-effort)
-        try:
-            await _put_to_queue_async(q, {"type": "error", "payload": str(exc)})
-        except Exception:
-            pass
+                        err = str(ws.exception())
+                        print(f"[{group}] WS ERROR: {err}")
+                        await _put_to_queue_async(q, {"type": "error", "payload": err})
+                    elif msg.type == WSMsgType.CLOSED:
+                        print(f"[{group}] WS CLOSED")
+                        break
+
+    except Exception as e:
+        print(f"[{group}] Connection FAILED: {e}")
+        await _put_to_queue_async(q, {"type": "error", "payload": str(e)})
 
 
 def worker_entry(username: str, stream_name: str, group: str, token: str, q: Queue):

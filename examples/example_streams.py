@@ -104,52 +104,26 @@ async def my_socket(signal_name, websocket, _):
         pass
 
 
-from plotune_sdk.src import PlotuneStream
-import requests
+stream = runtime.create_stream("my-second-stream")
+
+@stream.on_consume("prices")
+async def on_price(msg):
+    print("💰 PRICE:", msg)
+
+@stream.on_consume("trades")
+async def on_trade(msg):
+    print("⚡ TRADE:", msg)
+
+@stream.on_consume()
+async def on_anything(msg):
+    print("🎲 OTHER:", msg)
 
 async def main():
-
     runtime.start()
-
-    username, license_token = await runtime.core_client.authenticator.get_license_token()
-    API_URL = "https://api.plotune.net" 
-    stream_url = f"{API_URL}/auth/stream"
-
-
-    headers = {
-        "Authorization": f"Bearer {license_token}"
-    }
-    for i in range(3):
-        response = requests.get(stream_url, headers=headers)
-
-        stream_token = response.json().get("token")
-        if stream_token:
-            break
-    if not stream_token:
-        print("No Stream Token Recived",username,license_token,stream_url,end="\n")
-        response.raise_for_status()
-    stream = PlotuneStream(runtime, "my-second-stream")
-    stream.username = "veyselkantarcilar"
-
-    @stream.on_consume("prices")
-    async def handle_price(msg):
-        print("[PRICE]", msg)
-
-    @stream.on_consume("trades")
-    async def handle_trade(msg):
-        print("[TRADE]", msg)
-
-    print(stream.username, stream_token, "\n", license_token)
-    await stream.start(token=stream_token)
-
-    # keep running
-    try:
-        await asyncio.Event().wait()
-    finally:
-        await stream.stop()
-
-
+    print("🚀 Extension running — all streams auto-started & managed!")
+    await asyncio.Event().wait()  # Keep alive forever
 
 if __name__ == "__main__":
     asyncio.run(main())
     
+#D:/Projects/BAKSI/plotune-sdk/.venv/Scripts/python -m examples.example_streams
