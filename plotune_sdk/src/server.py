@@ -130,7 +130,7 @@ class PlotuneServer:
                 raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
             return result or {"status": "success"}
 
-        @self.api.websocket("/fetch/{signal_name}")
+        @self.api.websocket("/fetch/{signal_name:path}")
         async def websocket_endpoint(websocket: WebSocket, signal_name: str):
             handlers = self._ws_hooks.get("fetch", [])
             if not handlers:
