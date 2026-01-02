@@ -93,7 +93,7 @@ class PlotuneRuntime:
             try:
                 self.loop.close()
                 self.loop.stop()
-            except:
+            except BaseException:
                 self.kill()
 
     async def _main(self):
@@ -105,7 +105,8 @@ class PlotuneRuntime:
 
         self._server_task = asyncio.create_task(self.server.serve())
 
-        # Wait until server finishes OR is cancelled. Handle CancelledError cleanly.
+        # Wait until server finishes OR is cancelled. Handle CancelledError
+        # cleanly.
         try:
             await asyncio.wait([self._server_task], return_when=asyncio.FIRST_COMPLETED)
         except asyncio.CancelledError:

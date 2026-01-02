@@ -1,3 +1,4 @@
+from plotune_sdk import PlotuneRuntime
 from datetime import datetime
 from time import time
 
@@ -30,8 +31,6 @@ EXAMPLE_EXTENSION_CONFIG = {
     "configuration": {},
 }
 
-
-from plotune_sdk import PlotuneRuntime
 
 runtime = PlotuneRuntime(
     ext_name="file-extension",
