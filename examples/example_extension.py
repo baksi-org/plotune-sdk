@@ -23,9 +23,9 @@ EXAMPLE_EXTENSION_CONFIG = {
     "ask_form": False,
     "connection": {
         "ip": "127.0.0.1",  # where SDK server runs
-        "port": 8010,       # SDK server port
+        "port": 8010,  # SDK server port
         "target": "127.0.0.1",  # Plotune Core
-        "target_port": 8000,     # Core port
+        "target_port": 8000,  # Core port
     },
     "configuration": {},
 }

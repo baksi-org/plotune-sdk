@@ -9,9 +9,10 @@ class FileMetaData(BaseModel):
     """
     A detailed metadata model for a file.
     """
+
     id: uuid.UUID = Field(
         default_factory=uuid.uuid4,
-        description="A unique identifier for the file metadata."
+        description="A unique identifier for the file metadata.",
     )
     name: str = Field(..., description="The name of the file.")
     path: str = Field(..., description="The file path on the system.")
@@ -19,7 +20,9 @@ class FileMetaData(BaseModel):
     headers: Optional[List[str]] = Field(
         None, description="A list of headers found in the file."
     )
-    desc: Optional[str] = Field(None, description="A description of the file's content.")
+    desc: Optional[str] = Field(
+        None, description="A description of the file's content."
+    )
     tags: Optional[List[str]] = Field(None, description="A list of tags for the file.")
     created_at: Optional[datetime] = Field(
         None, description="The creation timestamp of the file."
@@ -33,7 +36,9 @@ class FileReadRequest(BaseModel):
     """
     A model to request reading a single file.
     """
+
     mode: Literal["online", "offline"] = Field(
-        ..., description="The reading mode, 'online' for a stream or 'offline' for a static read."
+        ...,
+        description="The reading mode, 'online' for a stream or 'offline' for a static read.",
     )
     path: str = Field(..., description="The file path to be read.")

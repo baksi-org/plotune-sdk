@@ -10,6 +10,7 @@ from plotune_sdk.src.runtime import PlotuneRuntime
 
 class DummyRuntime:
     """Minimal dummy runtime with a running loop and stop event."""
+
     def __init__(self):
         self.loop = asyncio.get_event_loop()
         self._stop_event = MpEvent()
@@ -42,7 +43,8 @@ async def test_stream_consume_handler(plotune_stream):
 
     # Simulate a queue and manually trigger handler
     test_msg = {"type": "message", "payload": {"data": 123}}
-    await plotune_stream._queue_reader("group1", Queue())  # Task starts, but queue is empty
+    # Task starts, but queue is empty
+    await plotune_stream._queue_reader("group1", Queue())
 
     # Directly call handler to simulate consumption
     for h in plotune_stream.handlers["group1"]:
@@ -69,9 +71,9 @@ async def test_aproduce(plotune_stream):
 @pytest.mark.asyncio
 async def test_enable_producer_sets_queue(plotune_stream):
     """Test that enabling producer sets the queue and worker."""
-    with patch(
-        "plotune_sdk.src.streams.Process"
-    ) as mock_process, patch("multiprocessing.Queue") as mock_queue:
+    with patch("plotune_sdk.src.streams.Process") as mock_process, patch(
+        "multiprocessing.Queue"
+    ) as mock_queue:
         mock_proc_instance = mock_process.return_value
         mock_proc_instance.is_alive.return_value = True
 

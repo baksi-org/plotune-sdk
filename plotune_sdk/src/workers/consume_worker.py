@@ -27,7 +27,9 @@ async def consume(
     url = build_url(username, stream_name, group)
     try:
         async with ClientSession() as session:
-            async with session.ws_connect(url, headers={"Authorization": f"Bearer {token}"}) as ws:
+            async with session.ws_connect(
+                url, headers={"Authorization": f"Bearer {token}"}
+            ) as ws:
                 while not stop_event.is_set():
                     try:
                         msg = await asyncio.wait_for(ws.receive(), timeout=0.5)
@@ -38,8 +40,14 @@ async def consume(
 
                     if msg.type == WSMsgType.TEXT:
                         data = json.loads(msg.data)
-                        await _put_to_queue_async(q, {"type": "message", "payload": data})
-                    elif msg.type in (WSMsgType.CLOSED, WSMsgType.CLOSING, WSMsgType.ERROR):
+                        await _put_to_queue_async(
+                            q, {"type": "message", "payload": data}
+                        )
+                    elif msg.type in (
+                        WSMsgType.CLOSED,
+                        WSMsgType.CLOSING,
+                        WSMsgType.ERROR,
+                    ):
                         break
     except Exception:
         if not stop_event.is_set():
@@ -54,7 +62,7 @@ def worker_entry(
     group: str,
     token: str,
     q: Queue,
-    stop_event = None,
+    stop_event=None,
 ):
     """Entry point for the worker process."""
     if stop_event is None:

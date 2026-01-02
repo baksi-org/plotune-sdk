@@ -66,34 +66,31 @@ async def my_variables(data: dict):
 async def generate_the_form(data: dict):
     form = FormLayout()
 
-    form.add_tab("Settings") \
-        .add_text("username", "Username", default="", required=True) \
-        .add_text("test_field", "Test", default="", required=False) \
-        .add_number(
-            "seed", "Seed", default=100, min_val=10, max_val=2000, required=False
-        ) \
-        .add_combobox(
-            "color",
-            "Color Pick",
-            options=["Red", "Green", "Blue"],
-            default="",
-            required=False,
-        )
+    form.add_tab("Settings").add_text(
+        "username", "Username", default="", required=True
+    ).add_text("test_field", "Test", default="", required=False).add_number(
+        "seed", "Seed", default=100, min_val=10, max_val=2000, required=False
+    ).add_combobox(
+        "color",
+        "Color Pick",
+        options=["Red", "Green", "Blue"],
+        default="",
+        required=False,
+    )
 
-    form.add_tab("Custom") \
-        .add_file("file", "Optional file", required=False)
+    form.add_tab("Custom").add_file("file", "Optional file", required=False)
 
-    form.add_group("Custom Group") \
-        .add_checkbox("enable", "Enable", default=True, required=False) \
-        .add_button(
-            "forward",
-            "Visit",
-            action={
-                "method": "POST",
-                "url": "http://example.com/api/upload",
-                "payload_fields": ["upload_file"],
-            },
-        )
+    form.add_group("Custom Group").add_checkbox(
+        "enable", "Enable", default=True, required=False
+    ).add_button(
+        "forward",
+        "Visit",
+        action={
+            "method": "POST",
+            "url": "http://example.com/api/upload",
+            "payload_fields": ["upload_file"],
+        },
+    )
 
     return form.to_schema()
 
@@ -110,9 +107,7 @@ async def my_socket(signal_name, websocket, _):
     print(f"{signal_name} requested")
     try:
         while True:
-            await websocket.send_json(
-                {"timestamp": time(), "value": random.random()}
-            )
+            await websocket.send_json({"timestamp": time(), "value": random.random()})
             await asyncio.sleep(0.03)
     except Exception:
         pass

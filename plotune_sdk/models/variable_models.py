@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 class Variable(BaseModel):
     """Represents a variable with source information."""
+
     name: str
     source_ip: str
     source_port: int
@@ -14,5 +15,6 @@ class Variable(BaseModel):
 
 class NewVariable(BaseModel):
     """Represents a new variable defined via expression using reference variables."""
+
     ref_variables: List[Variable]
     expr: str

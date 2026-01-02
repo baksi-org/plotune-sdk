@@ -63,7 +63,9 @@ class PlotuneServer:
 
     def update_policy(self, path: str, method: str, required: bool):
         """Update or override the route policy."""
-        logger.debug(f"Updating policy for {method} {path} to {'required' if required else 'optional'}")
+        logger.debug(
+            f"Updating policy for {method} {path} to {'required' if required else 'optional'}"
+        )
         self._handler_policy[(path, method.upper())] = required
 
     # -------------------------------------------------------------------------
@@ -84,7 +86,9 @@ class PlotuneServer:
         async def read_file(request: FileReadRequest):
             result = await self._trigger_event("/read-file", "POST", request)
             if result is None and self._handler_policy[("/read-file", "POST")]:
-                raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
+                raise HTTPException(
+                    status_code=500, detail="Extension doesn't handle this request"
+                )
             return result or {"path": request.path, "status": "not_handled"}
 
         @self.api.get("/form", tags=["form"])
@@ -96,7 +100,9 @@ class PlotuneServer:
         async def collect_user_input(input_form: dict):
             result = await self._trigger_event("/form", "POST", input_form)
             if result is None and self._handler_policy[("/form", "POST")]:
-                raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
+                raise HTTPException(
+                    status_code=500, detail="Extension doesn't handle this request"
+                )
             return result or {"status": "success"}
 
         @self.api.get("/fetch-meta", tags=["fetch"])
@@ -106,16 +112,30 @@ class PlotuneServer:
 
         @self.api.post("/bridge/{variable_name}")
         async def bridge_variable(variable_name: str, variable: Variable):
-            result = await self._trigger_event("/bridge/{variable_name}", "POST", variable)
-            if result is None and self._handler_policy[("/bridge/{variable_name}", "POST")]:
-                raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
+            result = await self._trigger_event(
+                "/bridge/{variable_name}", "POST", variable
+            )
+            if (
+                result is None
+                and self._handler_policy[("/bridge/{variable_name}", "POST")]
+            ):
+                raise HTTPException(
+                    status_code=500, detail="Extension doesn't handle this request"
+                )
             return result or {"status": "success"}
 
         @self.api.post("/unbridge/{variable_name}")
         async def unbridge_variable(variable_name: str, variable: Variable):
-            result = await self._trigger_event("/unbridge/{variable_name}", "POST", variable)
-            if result is None and self._handler_policy[("/unbridge/{variable_name}", "POST")]:
-                raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
+            result = await self._trigger_event(
+                "/unbridge/{variable_name}", "POST", variable
+            )
+            if (
+                result is None
+                and self._handler_policy[("/unbridge/{variable_name}", "POST")]
+            ):
+                raise HTTPException(
+                    status_code=500, detail="Extension doesn't handle this request"
+                )
             return result or {"status": "success"}
 
         @self.api.get("/functions", tags=["functions"])
@@ -125,9 +145,16 @@ class PlotuneServer:
 
         @self.api.post("/add-variable/{variable_name}", tags=["variables"])
         async def add_new_variable(variable_name: str, request: NewVariable):
-            result = await self._trigger_event("/add-variable/{variable_name}", "POST", request)
-            if result is None and self._handler_policy[("/add-variable/{variable_name}", "POST")]:
-                raise HTTPException(status_code=500, detail="Extension doesn't handle this request")
+            result = await self._trigger_event(
+                "/add-variable/{variable_name}", "POST", request
+            )
+            if (
+                result is None
+                and self._handler_policy[("/add-variable/{variable_name}", "POST")]
+            ):
+                raise HTTPException(
+                    status_code=500, detail="Extension doesn't handle this request"
+                )
             return result or {"status": "success"}
 
         @self.api.websocket("/fetch/{signal_name:path}")
@@ -156,24 +183,30 @@ class PlotuneServer:
     # -------------------------------------------------------------------------
     def on_event(self, path: str, method: str = "GET"):
         """Register a function as an HTTP event handler."""
+
         def decorator(func: Callable[..., Any]):
             key = (path, method.upper())
             self._event_hooks.setdefault(key, []).append(func)
             return func
+
         return decorator
 
     def on_ws(self, route: str = "fetch", require_response: bool = False):
         """Register a WebSocket handler."""
         self._ws_policy[route] = require_response
+
         def decorator(func: Callable[..., Any]):
             self._ws_hooks.setdefault(route, []).append(func)
             return func
+
         return decorator
 
     # -------------------------------------------------------------------------
     # Event triggering
     # -------------------------------------------------------------------------
-    async def _trigger_event(self, path: str, method: str, *args, **kwargs) -> Optional[Any]:
+    async def _trigger_event(
+        self, path: str, method: str, *args, **kwargs
+    ) -> Optional[Any]:
         key = (path, method.upper())
         if key not in self._event_hooks:
             return None
@@ -185,7 +218,9 @@ class PlotuneServer:
             result = out
         return result
 
-    async def _trigger_ws_event(self, signal_name: str, websocket: WebSocket, data: Any):
+    async def _trigger_ws_event(
+        self, signal_name: str, websocket: WebSocket, data: Any
+    ):
         if signal_name not in self._ws_hooks:
             return None
         result = None
@@ -201,9 +236,11 @@ class PlotuneServer:
     # -------------------------------------------------------------------------
     def route(self, path: str, method: str = "GET"):
         """Dynamically register a new HTTP route on the FastAPI app."""
+
         def decorator(func):
             self.api.add_api_route(path, func, methods=[method])
             return func
+
         return decorator
 
     # -------------------------------------------------------------------------

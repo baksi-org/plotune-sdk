@@ -93,8 +93,16 @@ def setup_uvicorn_logging() -> dict:
         },
         "loggers": {
             "uvicorn": {"handlers": ["file"], "level": "WARNING", "propagate": False},
-            "uvicorn.error": {"handlers": ["file"], "level": "WARNING", "propagate": False},
-            "uvicorn.access": {"handlers": ["file"], "level": "WARNING", "propagate": False},
+            "uvicorn.error": {
+                "handlers": ["file"],
+                "level": "WARNING",
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "handlers": ["file"],
+                "level": "WARNING",
+                "propagate": False,
+            },
         },
     }
 
@@ -127,8 +135,16 @@ def setup_uvicorn_logging() -> dict:
         },
         "loggers": {
             "uvicorn": {"handlers": ["default"], "level": "INFO", "propagate": False},
-            "uvicorn.error": {"handlers": ["default"], "level": "INFO", "propagate": False},
-            "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+            "uvicorn.error": {
+                "handlers": ["default"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "uvicorn.access": {
+                "handlers": ["access"],
+                "level": "INFO",
+                "propagate": False,
+            },
         },
     }
 

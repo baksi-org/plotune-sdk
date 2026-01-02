@@ -72,6 +72,7 @@ class PlotuneRuntime:
         def decorator(func):
             self._tray_actions.append((label, func))
             return func
+
         return decorator
 
     def _run_async_loop(self):
@@ -88,7 +89,7 @@ class PlotuneRuntime:
                 self.loop.run_until_complete(self.loop.shutdown_asyncgens())
             except Exception:
                 pass
-            
+
             try:
                 self.loop.close()
                 self.loop.stop()
@@ -120,7 +121,6 @@ class PlotuneRuntime:
             except Exception as e:
                 logger.exception("Error while stopping core client: %s", e)
 
-
     async def _stop_all_streams(self):
         self._stop_event.set()
         if not self._streams:
@@ -138,15 +138,17 @@ class PlotuneRuntime:
         self._setup_signal_handlers()
 
         for stream in self._streams.values():
-            asyncio.run_coroutine_threadsafe(self._ensure_stream_running(stream), self.loop)
-        
+            asyncio.run_coroutine_threadsafe(
+                self._ensure_stream_running(stream), self.loop
+            )
+
         self.thread.join()
 
     def _setup_signal_handlers(self):
         def handler(signum, _frame):
             logger.warning(f"Signal {signum} received — stopping runtime...")
             self.stop()
-        
+
         for s in (signal.SIGINT, signal.SIGTERM):
             signal.signal(s, handler)
 
@@ -186,13 +188,15 @@ class PlotuneRuntime:
         if self._stream_token_cache and self._stream_username_cache:
             return self._stream_username_cache, self._stream_token_cache
 
-        username, license_token = await self.core_client.authenticator.get_license_token()
+        username, license_token = (
+            await self.core_client.authenticator.get_license_token()
+        )
         username = username.split("@")[0]
         logger.debug(f"{username}, {license_token}")
         for _ in range(3):
             resp = await self.core_client.session.get(
                 f"{API_URL}/auth/stream",
-                headers={"Authorization": f"Bearer {license_token}"}
+                headers={"Authorization": f"Bearer {license_token}"},
             )
             resp.raise_for_status()
             token = resp.json()["token"]
@@ -244,9 +248,12 @@ class PlotuneRuntime:
                         f()
                 except Exception as e:
                     logger.exception("Tray action failed: %s", e)
+
             return callback
 
-        dynamic_items = [MenuItem(label, make_callback(func)) for label, func in self._tray_actions]
+        dynamic_items = [
+            MenuItem(label, make_callback(func)) for label, func in self._tray_actions
+        ]
         menu = Menu(*(dynamic_items + [Menu.SEPARATOR] + base_items))
         self.icon = Icon(self.ext_name, image, "Plotune Runtime", menu)
         threading.Thread(target=self.icon.run, daemon=False).start()

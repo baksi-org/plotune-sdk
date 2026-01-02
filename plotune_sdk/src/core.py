@@ -11,6 +11,7 @@ from plotune_sdk.src.authenticator import Authenticator
 
 logger = get_logger("plotune_core")
 
+
 class CoreClient:
     def __init__(self, runtime, core_url: str, config: dict):
         """
@@ -31,8 +32,8 @@ class CoreClient:
         self._hb_task: Optional[asyncio.Task] = None
         logger.debug(f"CoreClient initialized with core_url: {self.core_url}")
 
-        self.register_fail_handler:callable = None
-        self.heartbeat_fail_handler:callable = None
+        self.register_fail_handler: callable = None
+        self.heartbeat_fail_handler: callable = None
 
     async def register(self):
         """
@@ -46,7 +47,9 @@ class CoreClient:
         """
         try:
             url = f"{self.core_url}/register"
-            headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+            headers = (
+                {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
+            )
             payload = ExtensionConfig(**self.config).dict()
             logger.debug(f"Registering with payload: {payload}")
             r = await self.session.post(url, json=payload, headers=headers)
@@ -56,7 +59,6 @@ class CoreClient:
             logger.error(f"Failed to register with core server: {e}")
             if self.register_fail_handler:
                 self.register_fail_handler()
-
 
     async def send_heartbeat(self, ext_id: str) -> bool:
         """
@@ -81,7 +83,7 @@ class CoreClient:
             logger.warning(f"Heartbeat failed: {e}")
             return False
 
-    async def add_variable(self, variable_name:str, variable_desc:str="") -> dict:
+    async def add_variable(self, variable_name: str, variable_desc: str = "") -> dict:
         """
         Request the Core to add a new variable.
 
@@ -98,15 +100,15 @@ class CoreClient:
         payload = {
             "name": variable_name,
             "desc": variable_desc,
-            "extension_id": extension_id
+            "extension_id": extension_id,
         }
         logger.debug(f"Adding variable with payload: {payload}")
         r = await self.session.post(url, json=payload, headers=headers)
         r.raise_for_status()
         logger.info(f"Variable '{variable_name}' added to core.")
         return r.json()
-    
-    def add_variable_sync(self, variable_name:str, variable_desc:str="") -> dict:
+
+    def add_variable_sync(self, variable_name: str, variable_desc: str = "") -> dict:
         """
         Synchronous wrapper to add a new variable to the Core.
 
@@ -119,7 +121,9 @@ class CoreClient:
         """
         return asyncio.run(self.add_variable(variable_name, variable_desc))
 
-    async def heartbeat_loop(self, ext_id: str, interval: int = 15, max_failures: int = 3):
+    async def heartbeat_loop(
+        self, ext_id: str, interval: int = 15, max_failures: int = 3
+    ):
         """
         Continuously send periodic heartbeat messages to the Core.
 
@@ -140,13 +144,15 @@ class CoreClient:
                 fail_count += 1
                 logger.warning(f"Failed heartbeats: {fail_count}/{max_failures}")
                 if fail_count >= max_failures:
-                    logger.critical("Max heartbeat failures reached, stopping heartbeat loop")
+                    logger.critical(
+                        "Max heartbeat failures reached, stopping heartbeat loop"
+                    )
                     if self.heartbeat_fail_handler:
                         self.heartbeat_fail_handler()
                     break
             try:
-                wait_time = max(int(interval/(fail_count*2 + 1)), 1)
-                await asyncio.wait_for(self._stop_event.wait(), timeout = wait_time)
+                wait_time = max(int(interval / (fail_count * 2 + 1)), 1)
+                await asyncio.wait_for(self._stop_event.wait(), timeout=wait_time)
             except asyncio.TimeoutError:
                 continue  # timeout expired -> send next heartbeat
 
@@ -172,7 +178,12 @@ class CoreClient:
 
     # Plotune Core API wrappers can be added here
 
-    async def toast(self, title: str="Notification", message: str="Extension Message", duration:int=2500):
+    async def toast(
+        self,
+        title: str = "Notification",
+        message: str = "Extension Message",
+        duration: int = 2500,
+    ):
         """
         Send a toast (notification) message to the Plotune UI.
 
@@ -192,7 +203,7 @@ class CoreClient:
         r.raise_for_status()
         logger.info("Toast sent to core.")
         return r.json()
-    
+
     async def info(self):
         """
         Retrieve system information from the Plotune Core.
@@ -208,7 +219,7 @@ class CoreClient:
         info = r.json()
         logger.debug(f"Core info received: {info}")
         return info
-    
+
     async def start_extension(self, ext_id: str):
         """
         Request the Core to start a specific extension.
@@ -226,7 +237,7 @@ class CoreClient:
         r.raise_for_status()
         logger.info(f"Extension {ext_id} started.")
         return r.json()
-    
+
     async def get_configuration(self):
         """
         Fetch the currently active configuration from the Core.
@@ -242,7 +253,7 @@ class CoreClient:
         config = r.json()
         logger.debug(f"Configuration received: {config}")
         return config
-    
+
     async def update_configuration_from_path(self, path: str):
         """
         Instruct the Core to reload configuration from a specific file path.
@@ -261,4 +272,3 @@ class CoreClient:
         r.raise_for_status()
         logger.info(f"Configuration updated from path: {path}")
         return r.json()
-    

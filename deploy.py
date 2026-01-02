@@ -14,7 +14,9 @@ def deploy_package():
     pypi_token = os.getenv("PYPI_TOKEN")
 
     if not pypi_token:
-        print("[ERROR] PYPI_TOKEN is missing from the environment. Please verify your .env file.")
+        print(
+            "[ERROR] PYPI_TOKEN is missing from the environment. Please verify your .env file."
+        )
         return
 
     # Clean build artifacts
@@ -44,16 +46,16 @@ def deploy_package():
         env["TWINE_PASSWORD"] = pypi_token
 
         subprocess.run(
-            [python_exe, "-m", "twine", "upload", "dist/*"],
-            env=env,
-            check=True
+            [python_exe, "-m", "twine", "upload", "dist/*"], env=env, check=True
         )
         print("[SUCCESS] Upload completed successfully.")
 
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Upload failed: {e}")
     except FileNotFoundError:
-        print("[ERROR] The 'twine' module was not found. Please install it with 'pip install twine'.")
+        print(
+            "[ERROR] The 'twine' module was not found. Please install it with 'pip install twine'."
+        )
 
     print("=== Deployment process finished ===")
 

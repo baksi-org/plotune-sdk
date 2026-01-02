@@ -13,7 +13,7 @@ logger = get_logger("plotune_stream")
 class PlotuneStream:
     """Handles streams for Plotune SDK: manages producers, consumers, and async handlers."""
 
-    def __init__(self, runtime, stream_name: str, username:str = Optional[str]):
+    def __init__(self, runtime, stream_name: str, username: str = Optional[str]):
         self.runtime = runtime
         self.stream_name = stream_name
         self.username: Optional[str] = username
@@ -95,7 +95,14 @@ class PlotuneStream:
         q = Queue()
         p = Process(
             target=producer_worker_entry,
-            args=(self.username, self.stream_name, token, q, self.runtime._stop_event, self.producer_interval),
+            args=(
+                self.username,
+                self.stream_name,
+                token,
+                q,
+                self.runtime._stop_event,
+                self.producer_interval,
+            ),
         )
         p.start()
         self.producer_enabled = True
@@ -108,7 +115,14 @@ class PlotuneStream:
         q = Queue()
         p = Process(
             target=consumer_worker_entry,
-            args=(self.username, self.stream_name, group, token, q, self.runtime._stop_event),
+            args=(
+                self.username,
+                self.stream_name,
+                group,
+                token,
+                q,
+                self.runtime._stop_event,
+            ),
             daemon=True,
         )
         p.start()

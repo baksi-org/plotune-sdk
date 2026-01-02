@@ -39,7 +39,9 @@ async def producer_worker(
     while not stop_event.is_set():
         try:
             async with ClientSession() as session:
-                async with session.ws_connect(url, headers={"Authorization": f"Bearer {token}"}) as ws:
+                async with session.ws_connect(
+                    url, headers={"Authorization": f"Bearer {token}"}
+                ) as ws:
 
                     while not stop_event.is_set():
                         message = data_from_queue(q)
@@ -70,7 +72,7 @@ def worker_entry(
     stream_name: str,
     token: str,
     q: Queue,
-    stop_event = None,
+    stop_event=None,
     interval: float = 0.2,
 ):
     """Entry point for the producer worker process."""

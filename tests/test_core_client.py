@@ -8,6 +8,7 @@ from plotune_sdk.src.core import CoreClient
 
 class DummyRuntime:
     """A minimal dummy runtime for testing CoreClient."""
+
     def __init__(self):
         self.cache = {}
         self.loop = asyncio.get_event_loop()
@@ -37,7 +38,7 @@ async def test_get_token(core_client):
     mock_response.json.return_value = {
         "username": "testuser",
         "auth_token": "dummy_token",
-        "valid": True
+        "valid": True,
     }
     mock_response.raise_for_status.return_value = None
     core_client.session.get.return_value = mock_response
